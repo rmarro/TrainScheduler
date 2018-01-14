@@ -1,7 +1,8 @@
 // Initialize firebase
-// Create button for adding new train
-// Retrieve all train info and put in table
-// Calculate next arrival time and minutes until
+// Create button for adding new train that saves all form input to firebase
+// When new one added, retrieve all train info from firebase
+// Calculate next arrival time and minutes until next
+// Add all above to the table
 
 
 // Initialize firebase
@@ -80,6 +81,6 @@ database.ref().on("child_added", function(snapshot, prevChildKey) {
 
 // TO DO:
 // add if difference is POSITIVE, then leave above,
-// but if difference is NEGATIVE (train scheduled for future)
+// but if difference is NEGATIVE (first train scheduled for future)
 // next train is trainFirstFormat
 // and minutesAway is the difference made positive
