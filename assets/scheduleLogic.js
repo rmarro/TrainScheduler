@@ -3,6 +3,7 @@
 // When new one added, retrieve all train info from firebase
 // Calculate next arrival time and minutes until next
 // Add all above to the table
+//========================================================================
 
 
 // Initialize firebase
@@ -35,9 +36,7 @@ $("#add-train-btn").on("click", function(event) {
         destination: trainDest,
         firstTime: trainFirst,
         frequency: trainFreq
-
     };
-    console.log(newTrain);
 
     // Push that object to firebase
     database.ref().push(newTrain);
@@ -63,24 +62,25 @@ database.ref().on("child_added", function(snapshot, prevChildKey) {
     // Find number of minutes between first train time and current time
     var diff = moment().diff(moment(trainFirstFormat), "minutes");
 
-    // Divide by train frequency, Remainder is time since last train
-    var minutesSinceLast = diff % trainFreq;
-    
-    // Subtract time since last from frequency for minutes away
-    var minutesAway = trainFreq - minutesSinceLast;
+    // If first train already left
+    if (diff > 0) {
+        // Divide by train frequency, Remainder is time since last train
+        var minutesSinceLast = diff % trainFreq;
+        // Subtract time since last from frequency for minutes away
+        var minutesAway = trainFreq - minutesSinceLast;
+        // Add that to current time for next arrival
+        var nextArrival = moment().add(minutesAway, "minutes");
+        var nextArrivalFormat = moment(nextArrival).format("hh:mm a");
+    } 
+    // If first train is scheduled for a future time
+    else if (diff < 0) {
+        // Use first train time as next time, and difference as time away
+        var nextArrivalFormat = moment(trainFirstFormat).format("hh:mm a");
+        var minutesAway = diff*-1;
+    }
 
-    // Add that to current time for next arrival
-    var nextArrival = moment().add(minutesAway, "minutes");
-    var nextArrivalFormat = moment(nextArrival).format("hh:mm a");
-
-    // Add it to the table
+    // Add it all to the table
     $("#train-table > tbody").append("<tr><td>" + trainName + "</td><td>" + trainDest + "</td><td>" +
     trainFreq + "</td><td>" + nextArrivalFormat + "</td><td>" + minutesAway + "</td></tr>");
 
 });
-
-// TO DO:
-// add if difference is POSITIVE, then leave above,
-// but if difference is NEGATIVE (first train scheduled for future)
-// next train is trainFirstFormat
-// and minutesAway is the difference made positive
